@@ -342,8 +342,12 @@ progress {
 }
 
 [type=search] {
+    margin-top: 10px;
+    border-radius: 5px;
+
     outline-offset: -2px;
     -webkit-appearance: none
+    
 }
 
 [type=search]::-webkit-search-decoration {
@@ -1781,8 +1785,8 @@ pre code {
 
 .table td,
 .table th {
-    padding: .75rem;
-    vertical-align: top;
+    /* padding: .75rem; */
+    /* vertical-align: top; */
     border-top: 1px solid #e3e6f0
 }
 
@@ -5060,7 +5064,7 @@ input[type=submit].btn-block {
 .card-header {
     padding: .75rem 1.25rem;
     margin-bottom: 0;
-    background-color: #f8f9fc;
+    /* background-color: #f8f9fc; */
     border-bottom: 1px solid #e3e6f0
 }
 
@@ -8666,7 +8670,7 @@ button.bg-dark:hover {
 
 .pt-3,
 .py-3 {
-    padding-top: 1rem !important
+    /* padding-top: 1rem !important */
 }
 
 .pr-3,
@@ -12608,3 +12612,5 @@ footer.sticky-footer .copyright {
 body.sidebar-toggled footer.sticky-footer {
     width: 100%
 }
+
+

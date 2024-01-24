@@ -154,17 +154,29 @@ def ProductsAddView(request):
     if request.method == 'POST':
         # Save the POST arguements
         data = request.POST
-
+        category_id = data.get('category', '')
+        expire_date = data.get('expire_date', '')
+        if category_id and category_id.isdigit():#if category not enter from frontend
+            category = Category.objects.get(id=int(category_id))
+        else:
+            category = None   
+        if expire_date =='': #if expire date not enter from frontend
+            expire_date=None
         attributes = {
+            "category": category,
             "name": data['name'],
             "status": data['state'],
+            "expire_date": expire_date,
+            "barcode": data['barcode'],
+            "quantity": data['quantity'],
+            "sell_price": data['sell_price'],
             "description": data['description'],
-            "category": Category.objects.get(id=data['category']),
-            "price": data['price']
+            "purchase_price": data['purchase_price'],
         }
+        
 
         # Check if a product with the same attributes exists
-        if Product.objects.filter(**attributes).exists():
+        if Product.objects.filter(name=data['name'], barcode=data['barcode']).exists():
             messages.error(request, 'Product already exists!',
                            extra_tags="warning")
             return redirect('products:products_add')
@@ -214,29 +226,37 @@ def ProductsUpdateView(request, product_id):
 
     if request.method == 'POST':
         try:
-            # Save the POST arguements
+            # Save the POST arguements        ####### update products
             data = request.POST
+            category_id = data.get('category', '')
+            if category_id and category_id.isdigit():
+                category = Category.objects.get(id=int(category_id))
+            else:
+                category = None 
 
             attributes = {
                 "name": data['name'],
                 "status": data['state'],
                 "description": data['description'],
-                "category": Category.objects.get(id=data['category']),
-                "price": data['price']
+                "category": category,
+                "barcode": data['barcode'],
+                "quantity": data['quantity'],
+                "sell_price": data['sell_price'],
+                "purchase_price": data['purchase_price'],
+                "expire_date": data['expire_date'],
             }
-
+            print(attributes)
             # Check if a product with the same attributes exists
-            if product.objects.filter(**attributes).exists():
-                messages.error(request, 'Product already exists!',
-                               extra_tags="warning")
+           
+            if Product.objects.filter(**attributes).exclude(id=product_id).exists():
+                messages.error(request, 'Product already exists!', extra_tags="warning")
                 return redirect('products:products_add')
-
             # Get the product to update
             product = Product.objects.filter(
                 id=product_id).update(**attributes)
 
             product = Product.objects.get(id=product_id)
-
+            print(product)
             messages.success(request, '¡Product: ' + product.name +
                              ' updated successfully!', extra_tags="success")
             return redirect('products:products_list')

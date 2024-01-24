@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import model_to_dict
+# from django.utils import timezone
 
 
 class Category(models.Model):
@@ -32,16 +33,21 @@ class Product(models.Model):
     )
 
     name = models.CharField(max_length=256)
-    description = models.TextField(max_length=256)
+    description = models.TextField(max_length=256, null=True)
     status = models.CharField(
         choices=STATUS_CHOICES,
         max_length=100,
         verbose_name="Status of the product",
     )
     category = models.ForeignKey(
-        Category, related_name="category", on_delete=models.CASCADE, db_column='category')
+        Category, related_name="category", on_delete=models.CASCADE, db_column='category',null=True)
 
-    price = models.FloatField(default=0)
+    # price = models.FloatField(default=0)
+    barcode=models.CharField(max_length=256, default="")#add barcode field
+    quantity=models.IntegerField(default=0)#add quantity field
+    sell_price=models.FloatField(default=0)#add new field
+    purchase_price=models.FloatField(default=0)#add new field
+    expire_date=models.DateField(blank=True, null=True)
 
     class Meta:
         # Table's name

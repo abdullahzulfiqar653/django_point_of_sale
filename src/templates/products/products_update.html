@@ -29,11 +29,11 @@
                 <div class="form-row">
                     <div class="form-group col-md-8">
                         <label for="inputDescription">Name</label>
-                        <input type="text" class="form-control" name="name" value="{{product.name}}" required>
+                        <input type="text" class="form-control" name="name" value="{{product.name}}" >
                     </div>
                     <div class="form-group col-md-4">
                         <label for="state">State</label>
-                        <select name="state" class="form-control" required>
+                        <select name="state" class="form-control" >
                             {% for status in product_status %}
                                 {% if status.0 == product.status   %}
                                 <option value="{{status.0}}" selected>{{status.1}}</option>
@@ -48,11 +48,11 @@
                 <div class="form-row">
                     <div class="form-group col-md-8">
                         <label for="inputDescription">Description</label>
-                        <input type="text" name="description" class="form-control" value="{{product.description}}" required>
+                        <input type="text" name="description" class="form-control" value="{{product.description}}" >
                     </div>
                     <div class="form-group col-md-4">
                         <label for="category">Category</label>
-                        <select name="category" class="form-control" required>
+                        <select name="category" class="form-control">
                             <option value="" selected disabled hidden>Select the category</option>
                             {% for category in categories %}
                                 {% if product.category.id == category.id%}
@@ -67,9 +67,36 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-8">
-                        <label for="inputPrice">Price</label>
-                        <input type="number" name="price" step="any"  class="form-control" value="{{product.price}}"  required>
+                        
+                        <label for="inputPrice">Expire Date</label>
+                        <input type="date" name="expire_date" step="any"  class="form-control" value="{% if product.expire_date %}{{ product.expire_date|date:'Y-m-d' }}{% endif %}" >
+              
+                </div>
+                    <div class="form-group col-md-4">
+                        
+                            <label for="inputPrice">Barcode</label>
+                            <input type="text" name="barcode" step="any"  class="form-control" value="{{product.barcode}}">
+                  
                     </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputPrice">Sell Price</label>
+                        <input type="number" name="sell_price" step="any"  class="form-control" value="{{product.sell_price}}">
+                    </div>
+                    <div class="form-group col-md-4">
+                        
+                        <label for="inputPrice">Quantity</label>
+                        <input type="text" name="quantity" step="any"  class="form-control" value="{{product.quantity}}">
+              
+                </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputPrice">Purchase Price</label>
+                        <input type="number" name="purchase_price" step="any"  class="form-control" value="{{product.purchase_price}}">
+                    </div>
+                    
                 </div>
                 
 
