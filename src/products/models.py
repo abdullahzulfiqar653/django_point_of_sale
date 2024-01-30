@@ -40,9 +40,7 @@ class Product(models.Model):
         verbose_name="Status of the product",
     )
     category = models.ForeignKey(
-        Category, related_name="category", on_delete=models.CASCADE, db_column='category',null=True)
-
-    # price = models.FloatField(default=0)
+        Category, related_name="category", on_delete=models.CASCADE, db_column='category', null=True)
     barcode=models.CharField(max_length=256, default="")#add barcode field
     quantity=models.IntegerField(default=0)#add quantity field
     sell_price=models.FloatField(default=0)#add new field
@@ -60,7 +58,6 @@ class Product(models.Model):
         item = model_to_dict(self)
         item['id'] = self.id
         item['text'] = self.name
-        item['category'] = self.category.name
         item['quantity'] = 1
         item['total_product'] = 0
         return item

@@ -229,10 +229,13 @@ def ProductsUpdateView(request, product_id):
             # Save the POST arguements        ####### update products
             data = request.POST
             category_id = data.get('category', '')
-            if category_id and category_id.isdigit():
+            expire_date = data.get('expire_date', '')
+            if category_id == '':
                 category = Category.objects.get(id=int(category_id))
             else:
                 category = None 
+            if expire_date == '': #if expire date not enter from frontend
+               expire_date=None    
 
             attributes = {
                 "name": data['name'],
@@ -243,10 +246,10 @@ def ProductsUpdateView(request, product_id):
                 "quantity": data['quantity'],
                 "sell_price": data['sell_price'],
                 "purchase_price": data['purchase_price'],
-                "expire_date": data['expire_date'],
+                "expire_date": expire_date,
             }
             print(attributes)
-            # Check if a product with the same attributes exists
+            # Check if a product with the same attributes ##################################################################
            
             if Product.objects.filter(**attributes).exclude(id=product_id).exists():
                 messages.error(request, 'Product already exists!', extra_tags="warning")
@@ -256,7 +259,7 @@ def ProductsUpdateView(request, product_id):
                 id=product_id).update(**attributes)
 
             product = Product.objects.get(id=product_id)
-            print(product)
+            # print(product)
             messages.success(request, '¡Product: ' + product.name +
                              ' updated successfully!', extra_tags="success")
             return redirect('products:products_list')
@@ -297,12 +300,13 @@ def is_ajax(request):
 def GetProductsAJAXView(request):
     if request.method == 'POST':
         if is_ajax(request=request):
+            term = request.POST.get('term', '')
             data = []
-
             products = Product.objects.filter(
-                name__icontains=request.POST['term'])
+            barcode__icontains=term) | Product.objects.filter(name__icontains=term)
             for product in products[0:10]:
                 item = product.to_json()
                 data.append(item)
+              
 
             return JsonResponse(data, safe=False)
