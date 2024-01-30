@@ -46,12 +46,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for s in sales %}
+                        {% for s in sales|slice:"::-1" %}
                         <tr>
                             <td>{{forloop.counter}}</td>
                             <td>{{s.id}}</td>
                             <td>{{s.date_added}}</td>
-                            <td>{{s.customer.get_full_name}}</td>
+                            <td>{%if s.customer.get_full_name is None%} Guest {%else%} {{s.customer.get_full_name}}{%endif%} </td>
                             <td class="text-right" >{{s.grand_total}}</td>
                             <td class="text-center" >{{s.sum_items}}</td>
                             <td class="text-center">
