@@ -9,7 +9,7 @@ from .models import Category, Product
 def CategoriesListView(request):
     context = {
         "active_icon": "products_categories",
-        "categories": Category.objects.all()
+        "categories": Category.objects.all().order_by('-pk')
     }
     return render(request, "products/categories.html", context=context)
 
@@ -138,7 +138,7 @@ def CategoriesDeleteView(request, category_id):
 def ProductsListView(request):
     context = {
         "active_icon": "products",
-        "products": Product.objects.all()
+        "products": Product.objects.all().order_by('-pk')
     }
     return render(request, "products/products.html", context=context)
 

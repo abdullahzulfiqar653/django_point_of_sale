@@ -26,7 +26,7 @@ def is_ajax(request):
 def SalesListView(request):
     context = {
         "active_icon": "sales",
-        "sales": Sale.objects.all()
+        "sales": Sale.objects.all().order_by('-pk')
     }
     return render(request, "sales/sales.html", context=context)
 
@@ -36,7 +36,7 @@ def SalesAddView(request):
     hold_sales = Sale.objects.filter(payment_status='hold')
     context = {
         "active_icon": "sales",
-        "customers": [c.to_select2() for c in Customer.objects.all()],
+        "customers": [c.to_select2() for c in Customer.objects.all().order_by('-pk')],
         "hold_sales":hold_sales
     }
 

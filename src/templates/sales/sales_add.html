@@ -22,6 +22,7 @@
 {% block content %}
 <!--Go back-->
 <div class="row ml-0 mb-3 ">
+    <div>
     <a href="{% url 'sales:sales_list' %}">
         <button type="button" class="btn btn-info font-weight-bold">
             <i class="fas fa-long-arrow-alt-left mr-2"></i>
@@ -30,14 +31,20 @@
     </a>
     <button id="myButtons" class="btn btn-success font-weight-bold"  style="margin-left: 5px;">Refresh Customers</button>
 
-<!-- Button to save sale data to local storage -->
-<button class="btn btn-info font-weight-bold"  style="margin-left: 5px;" onclick="sale.saveSaleToLocalStorage()">On Hold</button>
-<input style="margin-left: 5px;" type="text" id="localStorageKeyName" placeholder="Enter Hold sale name">
+</div>
+
+<div style="margin: auto;"></div>
+ <div style="display: flex; align-items: center; justify-content: flex-end;">
+    <button class="btn btn-warning font-weight-bold" style="margin-left: 5px;" onclick="sale.saveSaleToLocalStorage()">On Hold</button>
+    <input style="margin-left: 5px;border-radius: 3%;" type="text" id="localStorageKeyName" placeholder="Enter Hold sale name">
     
-<!-- Button to retrieve sale data from local storage -->
-<button class="btn btn-success font-weight-bold" style="margin-left: 5px;" onclick="sale.getSaleFromLocalStorage()">GetSale</button>
-<select class="form-control select1" style="width: 10%; margin-left: 3px;margin-right: 3px;" id="localStorageKeys"></select>
-<button class="btn btn-danger font-weight-bold"  onclick="deleteSaleFromLocalStorage()">Delete Sale</button>
+    <!-- Button to retrieve sale data from local storage -->
+    <button class="btn btn-success font-weight-bold" id="getsale" style="margin-left: 5px; display: none;" onclick="sale.getSaleFromLocalStorage()">GetSale</button>
+    <select class="form-control select1" style="width: auto; margin-left: 3px;margin-right: 3px;display: none;" id="localStorageKeys"></select>
+    <button class="btn btn-danger font-weight-bold" style="display: none;" id="deleteSaleButton" onclick="deleteSaleFromLocalStorage()">Delete Sale</button>
+</div>
+
+
 </div>
 
 
@@ -92,8 +99,16 @@ function deleteSaleFromLocalStorage() {
 <script>
     // Retrieve all keys from localStorage
     var localStorageKeys = Object.keys(localStorage);
-    
-    // Get the select element
+   
+    if (localStorageKeys.length >=1  )
+    {
+        var deleteButton = document.getElementById('deleteSaleButton');
+        var getsaleButton = document.getElementById('getsale');
+        var select = document.getElementById('localStorageKeys');
+            deleteButton.style.display = 'block';   
+            getsaleButton.style.display='block';
+            select.style.display='block';
+    }
     var selectElement = document.getElementById('localStorageKeys');
 
     // Populate options in the select element
@@ -726,5 +741,20 @@ var every_product_discount=0
 
 
 </script>
-
+<script>
+    function updateButtonsAndSelectVisibility() {
+        var dropdown = document.getElementById('localStorageKeys');
+        var deleteButton = document.getElementById('deleteSaleButton');
+        deleteButton.style.display = 'none'; 
+        console.log("display none")
+        // Check if a value is selected in the dropdown
+        if (dropdown.value !== '') {
+            deleteButton.style.display = 'block';  // Show the "Delete Sale" button
+            dropdown.style.display = 'block';      // Show the select element
+        } else {
+            deleteButton.style.display = 'none';   // Hide the "Delete Sale" button
+            dropdown.style.display = 'none';       // Hide the select element
+        }
+    }
+    </script>
 {% endblock javascripts %}
