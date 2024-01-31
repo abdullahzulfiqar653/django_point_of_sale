@@ -7,7 +7,7 @@ from products.models import Product
 class Sale(models.Model):
     date_added = models.DateTimeField(default=django.utils.timezone.now)
     customer = models.ForeignKey(
-    Customer, models.DO_NOTHING, db_column='customer',null=True)
+    Customer, models.DO_NOTHING, db_column='customer', null=True)
     sub_total = models.FloatField(default=0)
     grand_total = models.FloatField(default=0)
     discount=models.FloatField(default=0)
@@ -15,7 +15,6 @@ class Sale(models.Model):
     amount_change = models.FloatField(default=0)
     PAYMENT_CHOICES = [
         ('paid', 'Paid'),
-        ('hold', 'Hold'),
         ('partial_paid', 'Partial Paid'),
     ]
 

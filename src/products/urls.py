@@ -27,5 +27,4 @@ urlpatterns = [
          views.ProductsDeleteView, name='products_delete'),
     # Get products AJAX
     path("get", views.GetProductsAJAXView, name="get_products"),
-    
 ]

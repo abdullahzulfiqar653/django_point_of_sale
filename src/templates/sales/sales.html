@@ -46,14 +46,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for s in sales|slice:"::-1" %}
+                        {% for sale in sales|slice:"::-1" %}
                         <tr>
                             <td>{{forloop.counter}}</td>
-                            <td>{{s.id}}</td>
-                            <td>{{s.date_added}}</td>
-                            <td>{%if s.customer.get_full_name is None%} Guest {%else%} {{s.customer.get_full_name}}{%endif%} </td>
-                            <td class="text-right" >{{s.grand_total}}</td>
-                            <td class="text-center" >{{s.sum_items}}</td>
+                            <td>{{sale.id}}</td>
+                            <td>{{sale.date_added}}</td>
+                            <td>{%if sale.customer.get_full_name is None%} Guest {%else%} {{sale.customer.get_full_name}}{%endif%} </td>
+                            <td class="text-right" >{{sale.grand_total}}</td>
+                            <td class="text-center" >{{sale.sum_items}}</td>
                             <td class="text-center">
                                 <!--View-->
                                 <a href="{% url 'sales:sales_details' s.id %}" class="text-decoration-none">

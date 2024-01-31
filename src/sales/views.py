@@ -51,7 +51,7 @@ def SalesAddView(request):
                 customer = None
             else:
                 customer = Customer.objects.get(id=int(customer)) 
-            if dicount == '':
+            if not dicount :
                 dicount = 0
             else:
                 dicount = dicount           

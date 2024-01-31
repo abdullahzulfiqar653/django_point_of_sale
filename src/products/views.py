@@ -230,13 +230,12 @@ def ProductsUpdateView(request, product_id):
             data = request.POST
             category_id = data.get('category', '')
             expire_date = data.get('expire_date', '')
-            if category_id == '':
+            if not category_id:
                 category = Category.objects.get(id=int(category_id))
             else:
                 category = None 
-            if expire_date == '': #if expire date not enter from frontend
-               expire_date=None    
-
+            if not expire_date: #if expire date not enter from frontend
+               expire_date = None    
             attributes = {
                 "name": data['name'],
                 "status": data['state'],
@@ -248,7 +247,7 @@ def ProductsUpdateView(request, product_id):
                 "purchase_price": data['purchase_price'],
                 "expire_date": expire_date,
             }
-            print(attributes)
+          
             # Check if a product with the same attributes ##################################################################
            
             if Product.objects.filter(**attributes).exclude(id=product_id).exists():
