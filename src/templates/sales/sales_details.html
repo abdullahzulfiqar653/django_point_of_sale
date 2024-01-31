@@ -58,8 +58,8 @@
                                             <tr>
                                                 <td>{{forloop.counter}}</td>
                                                 <td>{{detail.product.name}}</td>
-                                                <td>{{detail.price}}</td>
-                                                <td class="text-center">{{detail.quantity}}</td>
+                                                <td>{{detail.sell_price}}</td>
+                                                <td >{{detail.quantity}}</td>
                                                 <td>{{detail.total_detail}}</td>
                                             </tr>
                                             {% endfor %}
@@ -90,17 +90,12 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Tax Inclusive (%)</label>
+                                    <label>Discount</label>
                                     <div class="input-group">
-                                        <input name="tax_percentage" class="form-control" value="{{sale.tax_percentage}}" readonly>
+                                        <input name="tax_percentage" class="form-control" value="{{sale.discount}}" readonly>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>Tax Amount</label>
-                                    <div class="input-group">
-                                        <input name="tax_amount" class="form-control" value="{{sale.tax_amount}}" readonly>
-                                    </div>
-                                </div>
+                               
                                 <div class="form-group">
                                     <label>Grand Total</label>
                                     <div class="input-group">
@@ -113,7 +108,12 @@
                                         <input name="amount_payed" class="form-control" value="{{sale.amount_payed}}" readonly>
                                     </div>
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Amount Change</label>
+                                    <div class="input-group">
+                                        <input name="amount_payed" class="form-control" value="{{sale.amount_change}}" readonly>
+                                    </div>
+                                </div>
                             </div>
                             <!--End card-body-->
                     </div>

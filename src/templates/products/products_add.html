@@ -39,16 +39,17 @@
                             {% endfor %}
                         </select>
                     </div>
+                    
                 </div>
 
                 <div class="form-row">
                     <div class="form-group col-md-8">
                         <label for="inputDescription">Description</label>
-                        <input type="text" name="description" class="form-control" placeholder="Freshness Guaranteed Chicken Breast, 2.25 - 3.2 lb..." required>
+                        <input type="text" name="description" class="form-control" placeholder="Freshness Guaranteed Chicken Breast, 2.25 - 3.2 lb..." >
                     </div>
                     <div class="form-group col-md-4">
                         <label for="category">Category</label>
-                        <select name="category" class="form-control" required>
+                        <select name="category" class="form-control" >
                             <option value="" selected disabled hidden>Select the category</option>
                             {% for category in categories %}
                             <option value="{{category.id}}">{{category.name}}</option>
@@ -59,11 +60,38 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-8">
-                        <label for="inputPrice">Price</label>
-                        <input type="number" name="price" step="any"  class="form-control" placeholder="10.99" required>
+                        
+                        <label for="inputPrice">Expire Date</label>
+                        <input type="date" name="expire_date" step="any"  class="form-control" placeholder="date" >
+              
+                </div>
+                    <div class="form-group col-md-4">
+                        
+                            <label for="inputPrice">Barcode</label>
+                            <input type="text" name="barcode" step="any"  class="form-control" placeholder="0000102000" >
+                  
                     </div>
                 </div>
-                
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputPrice">Sell Price</label>
+                        <input type="number" name="sell_price" step="any"  class="form-control" placeholder="10.99" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        
+                        <label for="inputPrice">Quantity</label>
+                        <input type="text" name="quantity" step="any"  class="form-control" placeholder="01" required>
+              
+                </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="inputPrice">Purchase Price</label>
+                        <input type="number" name="purchase_price" step="any"  class="form-control" placeholder="10.99" required>
+                    </div>
+                    
+                </div>
+               
 
                 <button type="submit" class="btn btn-success font-weight-bold">Create product</button>
                

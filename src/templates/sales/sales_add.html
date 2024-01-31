@@ -12,22 +12,105 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
 <!--Bootstrap Touchspin-->
 <link rel="stylesheet" href="{% static 'assets/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 {% endblock stylesheets %}
 
 <!-- Page Heading -->
-{% block heading %}Add sale{% endblock heading %}
+
 
 <!-- Page content  -->
 {% block content %}
 <!--Go back-->
-<div class="row ml-0 mb-3">
+<div class="row ml-0 mb-3 ">
     <a href="{% url 'sales:sales_list' %}">
         <button type="button" class="btn btn-info font-weight-bold">
             <i class="fas fa-long-arrow-alt-left mr-2"></i>
             Go back
         </button>
     </a>
+    <button id="myButtons" class="btn btn-success font-weight-bold"  style="margin-left: 5px;">Refresh Customers</button>
+
+<!-- Button to save sale data to local storage -->
+<button class="btn btn-info font-weight-bold"  style="margin-left: 5px;" onclick="sale.saveSaleToLocalStorage()">On Hold</button>
+<input style="margin-left: 5px;" type="text" id="localStorageKeyName" placeholder="Enter Hold sale name">
+    
+<!-- Button to retrieve sale data from local storage -->
+<button class="btn btn-success font-weight-bold" style="margin-left: 5px;" onclick="sale.getSaleFromLocalStorage()">GetSale</button>
+<select class="form-control select1" style="width: 10%; margin-left: 3px;margin-right: 3px;" id="localStorageKeys"></select>
+<button class="btn btn-danger font-weight-bold"  onclick="deleteSaleFromLocalStorage()">Delete Sale</button>
 </div>
+
+
+<script>
+    function updateCustomers() {
+        $.get('{% url "sales:get_customers_ajax" %}', function(data) {
+            console.log('Received data:', data);
+
+            // Clear existing options
+            $('#searchbox_customers').empty();
+
+            // Add walking customer option
+            $('#searchbox_customers').append('<option value="walking_customer" selected>walking customer</option>');
+
+            // Add new customer options
+            for (var i = 0; i < data.length; i++) {
+                $('#searchbox_customers').append('<option value="' + data[i].value + '">' + data[i].label + '</option>');
+            }
+        });
+    }
+
+    // Initial update
+    updateCustomers();
+    $('#myButtons').on('click', function() {
+        updateCustomers();
+    });
+    // Set interval to update every 10 seconds
+    // setInterval(updateCustomers, 5000);
+</script>
+<script>
+
+function deleteSaleFromLocalStorage() {
+            // Get the selected key from the dropdown
+            var selectedKey = document.getElementById('localStorageKeys').value;
+
+            // If no key is selected, alert the user
+            if (!selectedKey) {
+                alert("Please select a key");
+                return;
+            }
+
+            // Remove the item from localStorage using the selected key
+            localStorage.removeItem(selectedKey);
+
+            console.log("Sale data deleted from local storage with key:", selectedKey);
+            location.reload();  
+            // Repopulate the select element with updated keys
+           
+        }
+
+</script>
+<script>
+    // Retrieve all keys from localStorage
+    var localStorageKeys = Object.keys(localStorage);
+    
+    // Get the select element
+    var selectElement = document.getElementById('localStorageKeys');
+
+    // Populate options in the select element
+    for (var i = 0; i < localStorageKeys.length; i++) {
+        var key = localStorageKeys[i];
+
+        // Create an option element
+        var optionElement = document.createElement('option');
+        
+        // Set the option's value and text content
+        optionElement.value = key;
+        optionElement.textContent = key;
+
+        // Append the option to the select element
+        selectElement.appendChild(optionElement);
+    }
+</script>
 
 <!--Sale products and details-->
 <form action="{% url 'sales:sales_add' %}" class="saleForm" method="post">
@@ -44,8 +127,11 @@
                                 <!--Search product-->
                                 <div class="form-group">
                                     <label>Search product:</label>
+                                    
                                     <div class="input-group">
-                                        <select class="form-control select2" name="searchbox_products" id="searchbox_products"></select>
+                                        
+                                        <select class="form-control select1" multiple="multiple" name="searchbox_products" id="searchbox_products"></select>
+                                    
                                     </div>
                                 </div>
                                 <!--End Search product-->
@@ -84,46 +170,61 @@
                         <div class="card card-secondary">
                             <div class="card-header">Sale details</div>
                             <div class="card-body">
+                                
                                 {% csrf_token %}
                                 <div class="form-group">
+                                    
                                     <label for="customer">Customer</label>
                                     <select name="customer" class="form-control" id="searchbox_customers" required>
-                                        <option value="" selected disabled hidden>Select the customer</option>
+                                        <option value="walking_customer" selected>walking customer</option>
+                                        <!-- <option value="" selected disabled hidden>Select the customer</option> -->
                                         {% for customer in customers %}
-                                        <option value="{{customer.value}}">{{customer.label}}</option>
+                                            <option value="{{customer.value}}">{{customer.label}}</option>
                                         {% endfor %}
                                     </select>
+                                    <div class="form-group mt-4">
+                                        <label>Sub Total</label>
+                                        <div class="input-group">
+                                            <input name="sub_total" class="form-control" >
+                                           
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-4">
+                                        <label>Discount</label>
+                                        <div class="input-group">
+                                            <input name="discount" id="discount" oninput="updatedicount()"class="form-control" >
+                                           
+                                        </div>
+                                    </div> 
                                 <div class="form-group mt-4">
-                                    <label>Subtotal</label>
-                                    <div class="input-group">
-                                        <input name="sub_total" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Tax Inclusive (%)</label>
-                                    <div class="input-group">
-                                        <input name="tax_percentage" class="form-control" value=0 required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Tax Amount</label>
-                                    <div class="input-group">
-                                        <input name="tax_amount" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
                                     <label>Grand Total</label>
                                     <div class="input-group">
-                                        <input name="grand_total" class="form-control" required>
+                                        <input name="grand_total" id="grand_total" class="form-control" readonly >
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label>Amount payed</label>
                                     <div class="input-group">
-                                        <input name="amount_payed" class="form-control" required>
+                                        <input name="amount_payed" id="amount_payed" class="form-control" >
                                     </div>
                                 </div>
-
+                               
+                                <div class="form-group">
+                                    <label for="status">Payment Status:</label>
+                                    <div class="input-group">
+                                        <select class="form-control select1"  name="payment_status" id="payment_status">
+                                            <option value="paid" selected>Paid</option>
+                                            <option value="hold">Hold</option>
+                                            <option value="partial_paid">Partial Paid</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Amount Change</label>
+                                    <div class="input-group">
+                                        <input name="amount_change" id="amount_change" class="form-control"  readonly>
+                                    </div>
+                                </div>
                                 <button type="submit" class="btn btn-success font-weight-bold">Create sale</button>
                             </div>
                             <!--End card-body-->
@@ -138,8 +239,6 @@
     </div>
 </form>
 {% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <!-- Datatables -->
 <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
@@ -151,7 +250,55 @@
 <!--Sweet Alert-->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
 
+
 <script>
+    function updatedicount() {
+        // Get the value from Field 1
+        var discount = parseFloat(document.getElementById('discount').value) || 0;
+        var subtotal = parseFloat($('[name="sub_total"]').val());
+        // Update Field 2 (adding 2 to Field 1)
+        var grandtotal = subtotal - discount;
+         $('input[name="grand_total"]').val(grandtotal ||0);
+    }
+</script>
+<script>
+ 
+var every_product_discount=0
+ $(document).ready(function () {
+    // Function to check and set payment status
+    function checkAndSetPaymentStatus() {
+        // Parse grand_total and amount_payed as floats
+        
+        var subtotal = parseFloat($('[name="sub_total"]').val());
+        var grandTotal = parseFloat($('[name="grand_total"]').val());
+        var amountPayed = parseFloat($('[name="amount_payed"]').val());
+        // Check if amount_payed is greater than or equal to grand_total
+        if (amountPayed >= grandTotal) {
+            // Set the 'Paid' option as selected
+            $('#payment_status').val('paid');
+        } else {
+            // Set the 'Partial Paid' option as selected
+            $('#payment_status').val('partial_paid');
+        }
+    }
+
+    // Call the function on page load
+    checkAndSetPaymentStatus();
+    $('[name="grand_total"]').on('keyup', function () {
+        checkAndSetPaymentStatus();
+    });
+
+    $('[name="amount_payed"]').on('keyup', function () {
+        checkAndSetPaymentStatus();
+    });
+});
+
+    $(document).on('select2:open', e => {
+    const select2 = $(e.target).data('select2');
+    if (!select2.options.get('multiple')) {
+        select2.dropdown.$search.get(0).focus();
+    }
+});
     // Source: https://stackoverflow.com/a/32605063
     function roundTo(n, digits) {
         if (digits === undefined) {
@@ -162,64 +309,94 @@
         n = parseFloat((n * multiplicator).toFixed(11));
         return Math.round(n) / multiplicator;
     }
-
-    //Variable for product number in table
     var number = 1;
-
-    //Variable to store sale details and products
     var sale = {
-        items: {
-            customer : 0, 
-            sub_total : 0.00, 
-            grand_total : 0.00, 
-            tax_amount : 0.00, 
-            tax_percentage : 0.00, 
-            amount_payed : 0.00, 
-            amount_change : 0.00,
-            products: [
+            items: {
+                customer : 0,
+                discount:0,
+                sub_total : 0.00, 
+                grand_total : 0, 
+                amount_payed : 0, 
+                amount_change : 0.00,
+                products: [
 
-            ]
-        },
-        calculate_sale: function (){
-            // Subtotal of all products added
-            var sub_total = 0.00
+                ]
+            },
+    //saveSaleToLocalStorage function
+                saveSaleToLocalStorage: function() {
+                        // Get the value from the input field
+                        var keyName = document.getElementById('localStorageKeyName').value;
 
-            var tax_percentage = $('input[name="tax_percentage"]').val();
-
-            // Calculates the total for each product
-            $.each(this.items.products, function(pos, dict){
-                dict.pos = pos;  
-                dict.total_product = roundTo(dict.quantity * dict.price, 2);
-                // Add the product total to the sale subtotal
-                sub_total += roundTo(dict.total_product, 2);
-            });
-
-            //Update the sale subtotal, grand total, and tax amount
-            this.items.sub_total = roundTo(sub_total, 2);
-            this.items.grand_total = roundTo(this.items.sub_total, 2);
-            this.items.tax_amount = roundTo(this.items.sub_total * (tax_percentage / 100), 2);
+                        // Validate if keyName is not empty
+                        if (!keyName) {
+                            alert("Please enter a key name");
+                            return;
+                        }
+                        // Convert the sale object to a JSON string
+                        var saleJson = JSON.stringify(sale.items);
+                        // Store the JSON string in local storage with the specified keyName
+                        localStorage.setItem(keyName, saleJson);
+                        location.reload();
+                        console.log("Sale data saved to local storage with key:", keyName);
+                    },
     
-            $('input[name="sub_total"]').val(this.items.sub_total);
-            $('input[name="tax_amount"]').val(this.items.tax_amount);
-            $('input[name="grand_total"]').val(this.items.grand_total);
-        },
+    // Retrieve the sale object from local storage
+                    getSaleFromLocalStorage: function () {
+                        var selectedKey = document.getElementById('localStorageKeys').value;
+
+                        // If no key is selected, alert the user
+                        if (!selectedKey) {
+                            alert("Please select a key");
+                            return;
+                        }
+                        var saleJson = localStorage.getItem(selectedKey);
+                        if (saleJson) {
+                                sale.items = JSON.parse(saleJson);
+                                sale.list_product();
+                                console.log("Sale data retrieved from local storage with key:", selectedKey);
+                            } else {
+                                console.log("Sale data not found for key:", selectedKey);
+                            }
+
+                    },
+                        calculate_sale: function (){
+                            var sub_total = 0.00
+                            var purchase_prices=0.00
+                            var purchase=0.00
+                            $.each(this.items.products, function(pos, dict){
+                                dict.pos = pos;  
+                                dict.total_product = roundTo(dict.quantity * dict.sell_price, 2);
+                                purchase_price=roundTo(dict.quantity * dict.purchase_price, 2);
+                                purchase=dict.total_product-purchase_price;
+                                sub_total += roundTo(dict.total_product, 2);
+                                purchase_prices+=roundTo(purchase,2);
+                            });
+                            this.items.sub_total = roundTo(sub_total, 2);
+                            this.items.purchase_prices = roundTo(purchase_prices, 2);
+                            this.items.grand_total = roundTo(this.items.sub_total, 2);
+                            $('input[name="sub_total"]').val(this.items.sub_total);
+                            // $('input[name="grand_total"]').val(this.items.grand_total);
+                            every_product_discount=this.items.purchase_prices;
+                            var discountValue = this.items.purchase_prices;
+                            $('input[name="discount"]').attr('placeholder', "maximum discount can be:" + discountValue);
+                            updatedicount();
+                        },
+        
         // Adds a product to the sale object
         add_product: function (item) {
-            this.items.products.push(item);
-            this.list_product();
+        this.items.products.push(item);
+        this.list_product();
         },
-        // Shows the selected product in the table
         list_product: function () {
             // Calculate the sale 
             this.calculate_sale();
-
             tblProducts = $("#table_products").DataTable({
                 destroy: true,
                 data: this.items.products,
                 columns: [
                     {"data": "number"}, 
                     {"data": "name"},
-                    {"data": "price"},
+                    {"data": "sell_price"},
                     {"data": "quantity"},
                     {"data": "total_product"},
                     {"data": "id"},
@@ -238,7 +415,7 @@
                         class: 'text-right',
                         targets: [2,4],
                         render: function (data, type, row){
-                            return parseFloat(data).toFixed(2) + ' $';
+                            return parseFloat(data).toFixed(2) + ' Rs';
                         },
                     },
                     {
@@ -265,13 +442,24 @@
                 },
             })
             
-            // IDs de productos ya seleccionados para exlcuir en la busqueda
-            //console.log("this.traer_ids()");
-            //console.log(this.traer_ids());
-            
         },
-    };
-
+        
+      };
+    $('[name="discount"]').on('input', function () {
+    var purchasePrices = every_product_discount;
+    var discount = parseFloat($(this).val());
+    console.log(purchasePrices,'Entered Discount Value:', discount);
+    if (!isNaN(purchasePrices) && !isNaN(discount) && discount > purchasePrices) {
+        Swal.fire({
+            title: 'Discount Amount is greater than Purchase Prices ',
+            icon: 'warning',
+        });
+        // Reset the discount value to zero
+        $(this).val('');
+        updatedicount()
+        return false;
+    }
+});
     $(document).ready(function() {
 
         //Tax percentage touchspin
@@ -296,9 +484,6 @@
 
         // Tables Events
         $('#table_products tbody').on('click', 'a[rel="delete"]', function () {
-                // When a product is deleted
-                
-                // Row variable of the table
                 var tr = tblProducts.cell($(this).closest('td, li')).index();
                 product_name = (tblProducts.row(tr.row).data().name)
 
@@ -315,11 +500,9 @@
                     confirmButtonText: 'Delete',
                     cancelButtonText: 'Cancel',
                     reverseButtons: true,
-
                 }).then((result) => {
                     // Si se confirma
-                    if (result.isConfirmed) {
-                        
+                    if (result.isConfirmed) {  
                         // Delete the product
                         sale.items.products.splice(tr.row, 1);
                         //List the table again
@@ -327,27 +510,16 @@
                         Swal.fire('The product was eliminated!', '', 'success')
                     };
                 })
-
-
-
             }).on('change keyup', 'input[name="quantity"]', function(){
-                // When a product changes is quantity
                 var quantity = parseInt($(this).val());
-                //console.log(quantity);
-                // Row variable of the table
                 var tr = tblProducts.cell($(this).closest('td, li')).index();
                 console.log(tr);
-                //var data = tblProductos.row(tr.row).node();
-                //console.log(data);
-                // Update the product quantity in the sale object
                 sale.items.products[tr.row].quantity = quantity;
                 console.log(sale.items.products);
-                // Calculate the sale with the new quantity
                 sale.calculate_sale();
-                // Find the row to update the product total
-                $('td:eq(4)', tblProducts.row(tr.row).node()).html(sale.items.products[tr.row].total_product + ' $');
+                $('td:eq(4)', tblProducts.row(tr.row).node()).html(sale.items.products[tr.row].total_product + ' Rs');
+                
         });
-
         // Delete all products
         $('.deleteAll').on('click', function(){
             // If there are no products doesn't do anything
@@ -369,9 +541,7 @@
             }).then((result) => {
                 // Si se confirma
                 if (result.isConfirmed) {
-                    // Borramos todos los productos del objeto de venta
                     sale.items.products = [];
-                    // Calculamos de vuelta la factura
                     sale.list_product();
                     Swal.fire('All products were eliminated!', '', 'success')
                 };
@@ -394,20 +564,23 @@
                 }
             }
         });
-
         $('#searchbox_products').select2({
+            selectOnClose: true,
             delay: 250,
+            theme: "classic",
             placeholder: 'Search a product',
             minimumInputLength: 1,
             allowClear: true,
+            dropdownParent: $('body'),
             templateResult: template_product_searchbox,
+            dropdownAutoWidth: true, // Adjust dropdown width automatically
+            minimumResultsForSearch: 20,
             ajax:{ 
                 url: "{% url 'products:get_products' %}",
                 type: 'POST',
                 data: function (params) {
                 var queryParameters = {
                     term: params.term,
-                    //excluir_prod_seleccionados: JSON.stringify(venta.traer_ids())
                 }
                 return queryParameters;
                 },
@@ -418,28 +591,25 @@
                     };
                 },
             }
-            }).on('select2:select', function (e) {
+            })
+            
+            .on('select2:select', function (e) {
                 //When a product is selected from the searchbox
                 var data = e.params.data;
                 //Add number, subtotal and quantity of the product to the dictionary
                 data.number = number;
                 number++; //Increase the product number in the table
-                //data.sub_total = 0;
-                //data.quantity = 1;
-                //Add the product to the sale object
                 sale.add_product(data);
                 console.log("Sale items");      
                 console.log(sale.items);      
                 //Clean the searchbox after the product is selected
                 $(this).val('').trigger('change.select2');; 
             });
-    
             // Products datatable
-            
             tblProducts = $('#table_products').DataTable({
                 columnDefs: [
                     {
-                        targets: [-1], // column index (start from 0)
+                        targets: [-2], // column index (start from 0)
                         orderable: false, // set orderable false for selected columns
                     }
                 ],
@@ -447,7 +617,6 @@
             
 
         });
-
         // Product searchbox templateResult
         function template_product_searchbox(repo) {
             if (repo.loading) {
@@ -461,7 +630,7 @@
                       //'<br>' +
                       '<p style="margin-bottom: 5px;">' +
                       '<b>Name:</b> ' + repo.text + " | Category: " + "<span class='btn-info px-2'>" + repo.category + '</span> <br>' +
-                      '<b>Price:</b> <span class="btn-success px-2">'+repo.price+' $. </span>'+
+                      '<b>Price:</b> <span class="btn-success px-2">'+repo.sell_price+' . </span>'+
                       '</p>' +
                     '</div>' +
                   '</div>' +
@@ -482,32 +651,27 @@
                 });
                 return false;
             };
-            
-            // Only allow to send if the payed amount is equal or greater than the total
-            if ($('[name="amount_payed"]').val() <= $('[name="grand_total"]').val()) {
+            if ($('[name="grand_total"]').val() > $('[name="amount_payed"]').val()) {
+                
                 Swal.fire({
-                    title: 'Payable Amount is lower that the Grand Total',
+                    title: 'Payable Amount is lower that the Grand Total' ,
                     icon: 'warning',
                 });
                 return false;
             }
-
-            // Agregamos los datos faltantes al objeto sales
             sale.items.customer = $('select[name="customer"]').val();
             console.log("Customer: " + sale.items.customer)
-            sale.items.sub_total = $('input[name="sub_total"]').val(); 
+            sale.items.discount = $('input[name="discount"]').val(); 
+            sale.items.payment_status = $('select[name="payment_status"]').val();
             sale.items.grand_total = $('input[name="grand_total"]').val();
-            sale.items.tax_amount = $('input[name="tax_amount"]').val(); 
+            // sale.items.tax_amount = $('input[name="tax_amount"]').val(); 
             sale.items.tax_percentage = $('input[name="tax_percentage"]').val();
             sale.items.amount_payed = $('input[name="amount_payed"]').val(); 
             sale.items.amount_change = roundTo($('input[name="amount_payed"]').val() - $('input[name="grand_total"]').val(), 2); 
-
             console.log("Sale:")
             console.log(sale.items)
-
             // Validate the csrf_token
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
             function csrfSafeMethod(method) {
             // these HTTP methods do not require CSRF protection
             return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -542,6 +706,25 @@
             });
             
         });
-        
+        $(document).ready(function () {
+    // Attach an event listener to the payAmount input field
+    $('#amount_payed').on('input', function () {
+        // Get values from the input fields
+        var totalAmount = parseFloat($('#grand_total').val()) || 0;
+        var payAmount = parseFloat($(this).val()) || 0;
+
+        // Calculate the charge amount
+        var chargeAmount =  payAmount -totalAmount;
+
+        // Update the value of the chargeAmount field
+        $('#amount_change').val(chargeAmount.toFixed(2)); // Assuming you want two decimal places
+    });
+});
+      
+      
+
+
+
 </script>
+
 {% endblock javascripts %}

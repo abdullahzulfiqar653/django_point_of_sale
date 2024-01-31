@@ -7,13 +7,18 @@ from products.models import Product
 class Sale(models.Model):
     date_added = models.DateTimeField(default=django.utils.timezone.now)
     customer = models.ForeignKey(
-        Customer, models.DO_NOTHING, db_column='customer')
+    Customer, models.DO_NOTHING, db_column='customer', null=True)
     sub_total = models.FloatField(default=0)
     grand_total = models.FloatField(default=0)
-    tax_amount = models.FloatField(default=0)
-    tax_percentage = models.FloatField(default=0)
+    discount=models.FloatField(default=0)
     amount_payed = models.FloatField(default=0)
     amount_change = models.FloatField(default=0)
+    PAYMENT_CHOICES = [
+        ('paid', 'Paid'),
+        ('partial_paid', 'Partial Paid'),
+    ]
+
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default = 'paid')
 
     class Meta:
         db_table = 'Sales'
@@ -31,7 +36,7 @@ class SaleDetail(models.Model):
         Sale, models.DO_NOTHING, db_column='sale')
     product = models.ForeignKey(
         Product, models.DO_NOTHING, db_column='product')
-    price = models.FloatField()
+    sell_price = models.FloatField()
     quantity = models.IntegerField()
     total_detail = models.FloatField()
 
